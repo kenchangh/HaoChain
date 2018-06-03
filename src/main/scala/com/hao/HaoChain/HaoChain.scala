@@ -1,11 +1,19 @@
+import com.google.gson.GsonBuilder
 import com.hao.HaoChain.{Block, Blockchain}
 
 
 class HaoChain extends Blockchain {
-  difficulty = 6
+  difficulty = 3
 }
 
 object HaoChain {
+
+  def printBlockchain(blockchain: Blockchain): Unit = {
+    for (block <- blockchain.blocks) {
+      val blockchainJson: String = new GsonBuilder().setPrettyPrinting().create().toJson(block)
+      println(blockchainJson)
+    }
+  }
 
   def main(args: Array[String]): Unit = {
     val genesisHash = "A6D72BAA3DB900B03E70DF880E503E9164013B4D9A470853EDC115776323A098"
@@ -31,6 +39,8 @@ object HaoChain {
     blockchain.blocks(2).mineBlock(blockchain.difficulty)
     endTime = System.currentTimeMillis()
     println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+
+    printBlockchain(blockchain)
   }
 }
 
