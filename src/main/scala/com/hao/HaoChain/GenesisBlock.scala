@@ -1,0 +1,7 @@
+package com.hao.HaoChain
+
+object GenesisBlock {
+
+  val GENESIS_HASH: String = "A6D72BAA3DB900B03E70DF880E503E9164013B4D9A470853EDC115776323A098"
+
+}

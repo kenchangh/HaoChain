@@ -1,7 +1,13 @@
 package com.hao.HaoChain
 
-import java.security.{PrivateKey, PublicKey, KeyPair, KeyPairGenerator, SecureRandom}
+import java.math.BigInteger
+import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey, SecureRandom}
 import java.security.spec.ECGenParameterSpec
+
+abstract class AccountState {
+  val balance: BigInteger
+  val nonce: Int
+}
 
 trait PublicKeyCryptoWallet {
   var privateKey: PrivateKey

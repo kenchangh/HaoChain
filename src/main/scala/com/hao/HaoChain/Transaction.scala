@@ -8,35 +8,45 @@ trait GenericTransaction {
   val sender: Account
   val recipient: Account
   val value: Float
-  val signature: Array[Byte]
+  var signature: Array[Byte]
 }
 
 class Transaction(val sender: Account, val recipient: Account,
                   val value: Float) extends GenericTransaction {
-  var sequence = 0
   val outputs = ArrayBuffer[Int]()
-  val signature = null
+  var signature: Array[Byte] = null
+  sender.nonce += 1
+  val nonce = sender.nonce
 
   val senderKey = sender.publicKey
   val recipientKey = recipient.publicKey
 
   def calculateHash(): String = {
-    sender.nonce += 1
     return StringUtils.sha256(
       StringUtils.getKeyFromString(senderKey) +
         StringUtils.getKeyFromString(recipientKey) +
         value.toString +
-        sender.nonce.toString
+        nonce.toString
     )
+  }
+
+  def isValidTransaction: Boolean = {
+    if (!verifySignature()) {
+      println("Transaction failed to verify")
+      return false
+    }
+
+    return true
   }
 
   def generateSignature(privateKey: PrivateKey): Array[Byte] = {
     val data: String = StringUtils.getKeyFromString(senderKey) +
       StringUtils.getKeyFromString(recipientKey) + value.toString
-    return StringUtils.applyECDSASig(privateKey, data)
+    signature = StringUtils.applyECDSASig(privateKey, data)
+    return signature
   }
 
-  def verifySignature(signature: Array[Byte]): Boolean = {
+  def verifySignature(): Boolean = {
     val data: String = StringUtils.getKeyFromString(senderKey) +
       StringUtils.getKeyFromString(recipientKey) + value.toString
     return StringUtils.verifyECDSASig(senderKey, data, signature)

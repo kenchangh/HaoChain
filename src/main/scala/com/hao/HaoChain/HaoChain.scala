@@ -4,8 +4,13 @@ import com.google.gson.GsonBuilder
 import com.hao.HaoChain._
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
+import scala.collection.immutable.HashMap
 
-class HaoChain extends Blockchain {
+trait GlobalBlockchainState {
+  var accounts: HashMap[String, AccountState] = new HashMap[String, AccountState]()
+}
+
+class HaoChain extends Blockchain with GlobalBlockchainState {
   difficulty = 3
 }
 
@@ -25,16 +30,15 @@ object HaoChain {
     println(StringUtils.getKeyFromString(wallet1.publicKey), StringUtils.getKeyFromString(wallet2.publicKey))
     val txn: Transaction = new Transaction(wallet1, wallet2, 50)
     val signature: Array[Byte] = txn.generateSignature(wallet1.privateKey)
-    println("Signature verified", txn.verifySignature(signature))
+    println("Signature verified", txn.verifySignature())
   }
 
   def miningTest(args: Array[String]): Unit = {
-    val genesisHash = "A6D72BAA3DB900B03E70DF880E503E9164013B4D9A470853EDC115776323A098"
     var hash: String = ""
     var blockchain: HaoChain = new HaoChain()
 
     var startTime: Long = System.currentTimeMillis()
-    blockchain.blocks.append(new Block(genesisHash, "First block"))
+    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
     hash = blockchain.blocks(0).mineBlock(blockchain.difficulty)
     var endTime: Long = System.currentTimeMillis()
     println("Block " + hash + "mined in: " + (endTime - startTime).toString)
