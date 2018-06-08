@@ -1,8 +1,12 @@
 package com.hao.HaoChain
 
+import java.math.BigInteger
 import java.security.{PrivateKey, PublicKey}
 
 import scala.collection.mutable.ArrayBuffer
+
+class TransactionJSON(val sender: String, val recipient: String,
+                      val value: Float, val signature: String, val nonce: Int)
 
 trait GenericTransaction {
   val sender: Account
@@ -12,11 +16,9 @@ trait GenericTransaction {
 }
 
 class Transaction(val sender: Account, val recipient: Account,
-                  val value: Float) extends GenericTransaction {
+                  val value: Float, val nonce: Int) extends GenericTransaction {
   val outputs = ArrayBuffer[Int]()
   var signature: Array[Byte] = null
-  sender.nonce += 1
-  val nonce = sender.nonce
 
   val senderKey = sender.publicKey
   val recipientKey = recipient.publicKey
@@ -35,7 +37,6 @@ class Transaction(val sender: Account, val recipient: Account,
       println("Transaction failed to verify")
       return false
     }
-
     return true
   }
 

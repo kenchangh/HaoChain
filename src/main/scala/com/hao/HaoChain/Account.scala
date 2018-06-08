@@ -1,12 +1,19 @@
 package com.hao.HaoChain
 
+import java.math
 import java.math.BigInteger
 import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey, SecureRandom}
 import java.security.spec.ECGenParameterSpec
 
-abstract class AccountState {
-  val balance: BigInteger
-  val nonce: Int
+import com.google.gson.{Gson, GsonBuilder}
+
+class AccountState(val balance: Float, val nonce: Int) {
+
+  def this() = this(0, 0)
+
+  override def toString: String = {
+    return new GsonBuilder().setPrettyPrinting().create().toJson(this)
+  }
 }
 
 trait PublicKeyCryptoWallet {
@@ -33,5 +40,9 @@ class Account extends PublicKeyCryptoWallet {
     privateKey = keyPair.getPrivate
     publicKey = keyPair.getPublic
     return keyPair
+  }
+
+  def transfer(recipient: Account, value: Float, nonce: Int): Transaction = {
+    return new Transaction(this, recipient, value, nonce)
   }
 }

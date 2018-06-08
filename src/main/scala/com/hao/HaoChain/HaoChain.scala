@@ -1,3 +1,4 @@
+import java.math.BigInteger
 import java.security.Security
 
 import com.google.gson.GsonBuilder
@@ -6,58 +7,82 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 import scala.collection.immutable.HashMap
 
-trait GlobalBlockchainState {
+trait GlobalAccountState {
   var accounts: HashMap[String, AccountState] = new HashMap[String, AccountState]()
+
+  def addAccount(account: Account) = {
+    val publicKey= StringUtils.getKeyFromString(account.publicKey)
+    val freshAccountState = new AccountState()
+    accounts += (publicKey -> freshAccountState)
+  }
+
+  def newAccount(): Account = {
+    val account = new Account()
+    addAccount(account)
+    return account
+  }
+
+  def getBalance(account: Account): Float = {
+    val accountState: AccountState = accounts(StringUtils.getKeyFromString(account.publicKey))
+    return accountState.balance
+  }
 }
 
-class HaoChain extends Blockchain with GlobalBlockchainState {
+class HaoChain extends Blockchain with GlobalAccountState {
   difficulty = 3
 }
 
 object HaoChain {
 
-  def printBlockchain(blockchain: Blockchain): Unit = {
-    for (block <- blockchain.blocks) {
-      val blockchainJson: String = new GsonBuilder().setPrettyPrinting().create().toJson(block)
-      println(blockchainJson)
-    }
-  }
-
   def main(args: Array[String]): Unit = {
     Security.addProvider(new BouncyCastleProvider())
-    val wallet1: Account = new Account()
-    val wallet2: Account = new Account()
-    println(StringUtils.getKeyFromString(wallet1.publicKey), StringUtils.getKeyFromString(wallet2.publicKey))
-    val txn: Transaction = new Transaction(wallet1, wallet2, 50)
-    val signature: Array[Byte] = txn.generateSignature(wallet1.privateKey)
-    println("Signature verified", txn.verifySignature())
+    var haochain = new HaoChain()
+
+    val coinbase = haochain.newAccount()
+    val account1 = haochain.newAccount()
+    val account2 = haochain.newAccount()
+
+    // Genesis block
+    val genesisTransaction = new Transaction(coinbase, account1, 100, coinbase.nonce)
+    genesisTransaction.generateSignature(coinbase.privateKey)
+    val genesisBlock: Block = new Block(haochain.accounts, GenesisBlock.GENESIS_HASH, "GENESIS")
+    genesisBlock.addTransaction(genesisTransaction)
+    haochain.addBlock(genesisBlock)
+    haochain.printBlockchain()
+
+    // 1st block
+    val block1 = new Block(haochain.accounts, genesisBlock.hash, "Block 1")
+    block1.addTransaction(account1.transfer(account2, 20, account1.nonce))
+    block1.addTransaction(account2.transfer(account1, 10, account2.nonce))
+    haochain.addBlock(block1)
+    haochain.printBlockchain()
   }
 
   def miningTest(args: Array[String]): Unit = {
-    var hash: String = ""
-    var blockchain: HaoChain = new HaoChain()
-
-    var startTime: Long = System.currentTimeMillis()
-    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
-    hash = blockchain.blocks(0).mineBlock(blockchain.difficulty)
-    var endTime: Long = System.currentTimeMillis()
-    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-
-    startTime = System.currentTimeMillis()
-    blockchain.blocks.append(
-      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Second block"))
-    blockchain.blocks(1).mineBlock(blockchain.difficulty)
-    endTime = System.currentTimeMillis()
-    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-
-    startTime = System.currentTimeMillis()
-    blockchain.blocks.append(
-      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Third block"))
-    blockchain.blocks(2).mineBlock(blockchain.difficulty)
-    endTime = System.currentTimeMillis()
-    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-
-    printBlockchain(blockchain)
+//    var hash: String = ""
+//    var blockchain: HaoChain = new HaoChain()
+//
+//    var startTime: Long = System.currentTimeMillis()
+//    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
+//    hash = blockchain.blocks(0).mineBlock(blockchain.difficulty)
+//    var endTime: Long = System.currentTimeMillis()
+//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+//
+//    startTime = System.currentTimeMillis()
+//    blockchain.blocks.append(
+//      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Second block"))
+//    blockchain.blocks(1).mineBlock(blockchain.difficulty)
+//    endTime = System.currentTimeMillis()
+//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+//
+//    startTime = System.currentTimeMillis()
+//    blockchain.blocks.append(
+//      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Third block"))
+//    blockchain.blocks(2).mineBlock(blockchain.difficulty)
+//    endTime = System.currentTimeMillis()
+//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+//
+//    blockchain.printBlockchain()
   }
 }
 
