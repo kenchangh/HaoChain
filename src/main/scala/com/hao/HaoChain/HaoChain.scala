@@ -1,32 +1,8 @@
-import java.math.BigInteger
 import java.security.Security
 
-import com.google.gson.GsonBuilder
 import com.hao.HaoChain._
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
-import scala.collection.immutable.HashMap
-
-trait GlobalAccountState {
-  var accounts: HashMap[String, AccountState] = new HashMap[String, AccountState]()
-
-  def addAccount(account: Account) = {
-    val publicKey= StringUtils.getKeyFromString(account.publicKey)
-    val freshAccountState = new AccountState()
-    accounts += (publicKey -> freshAccountState)
-  }
-
-  def newAccount(): Account = {
-    val account = new Account()
-    addAccount(account)
-    return account
-  }
-
-  def getBalance(account: Account): Float = {
-    val accountState: AccountState = accounts(StringUtils.getKeyFromString(account.publicKey))
-    return accountState.balance
-  }
-}
 
 class HaoChain extends Blockchain with GlobalAccountState {
   difficulty = 3
@@ -45,7 +21,8 @@ object HaoChain {
     // Genesis block
     val genesisTransaction = new Transaction(coinbase, account1, 100, coinbase.nonce)
     genesisTransaction.generateSignature(coinbase.privateKey)
-    val genesisBlock: Block = new Block(haochain.accounts, GenesisBlock.GENESIS_HASH, "GENESIS")
+    val genesisBlock: Block = new Block(
+      haochain.accounts, GenesisBlock.GENESIS_HASH, GenesisBlock.GENESIS_DATA)
     genesisBlock.addTransaction(genesisTransaction)
     haochain.addBlock(genesisBlock)
     haochain.printBlockchain()
