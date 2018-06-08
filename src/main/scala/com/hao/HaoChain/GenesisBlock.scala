@@ -2,7 +2,7 @@ package com.hao.HaoChain
 
 object GenesisBlock {
 
-  val GENESIS_HASH: String = "A6D72BAA3DB900B03E70DF880E503E9164013B4D9A470853EDC115776323A098"
-  val GENESIS_DATA: String = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+  val GENESIS_HASH: String = "0A0A15967C3010B990041C2DEF58859EC62DACBCC87216D05A0CC75A6F140830"
+  val GENESIS_DATA: String = "Howard Roark laughed."
 
 }
