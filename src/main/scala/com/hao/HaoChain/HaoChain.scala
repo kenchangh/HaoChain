@@ -20,10 +20,10 @@ object HaoChain {
 
   def main(args: Array[String]): Unit = {
     Security.addProvider(new BouncyCastleProvider())
-    val wallet1: Wallet = new Wallet()
-    val wallet2: Wallet = new Wallet()
+    val wallet1: Account = new Account()
+    val wallet2: Account = new Account()
     println(StringUtils.getKeyFromString(wallet1.publicKey), StringUtils.getKeyFromString(wallet2.publicKey))
-    val txn: Transaction = new Transaction(wallet1.publicKey, wallet2.publicKey, 50, null)
+    val txn: Transaction = new Transaction(wallet1, wallet2, 50)
     val signature: Array[Byte] = txn.generateSignature(wallet1.privateKey)
     println("Signature verified", txn.verifySignature(signature))
   }

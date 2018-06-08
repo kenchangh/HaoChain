@@ -8,11 +8,12 @@ trait PublicKeyCryptoWallet {
   var publicKey: PublicKey
 }
 
-class Wallet extends PublicKeyCryptoWallet {
+class Account extends PublicKeyCryptoWallet {
 
   val keyPair: KeyPair = generateKeyPair()
   var privateKey = keyPair.getPrivate
   var publicKey = keyPair.getPublic
+  var nonce = 0
 
   def generateKeyPair(): KeyPair = {
     val keyGen = KeyPairGenerator.getInstance("ECDSA", "BC")
