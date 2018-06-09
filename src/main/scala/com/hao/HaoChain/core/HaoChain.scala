@@ -1,7 +1,7 @@
+package com.hao.HaoChain.core
+
 import java.security.Security
 
-import com.hao.HaoChain._
-import com.hao.HaoChain.core._
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
@@ -42,7 +42,7 @@ object HaoChain {
 
   def miningTest(args: Array[String]): Unit = {
 //    var hash: String = ""
-//    var blockchain: HaoChain = new HaoChain()
+//    var blockchain: com.hao.HaoChain.core.HaoChain = new com.hao.HaoChain.core.HaoChain()
 //
 //    var startTime: Long = System.currentTimeMillis()
 //    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
