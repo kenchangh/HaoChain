@@ -35,11 +35,11 @@ object StringUtils {
     return Base64.getEncoder.encodeToString(key.getEncoded)
   }
 
-//  def getKeyFromString(string: String): Key = {
-//    val keyBytes = Base64.getDecoder.decode(string)
-//    val key = new SecretKeySpec(keyBytes,0,keyBytes.length,"ECDSA")
-//    return key
-//  }
+  def getKeyFromString(string: String): Key = {
+    val keyBytes = Base64.getDecoder.decode(string)
+    val key = new SecretKeySpec(keyBytes,0,keyBytes.length,"ECDSA")
+    return key
+  }
 
   def applyECDSASig(privateKey: PrivateKey, input: String): Array[Byte] = {
     var dsa: Signature = null

@@ -22,14 +22,20 @@ object HaoChain {
 
   def chainDirectoryPath: String = {
     val homeDir = System.getProperty("user.home")
-    return new File(homeDir, "/haochain").toString()
+    return StringUtils.concatPath(homeDir, "/haoChain").toString
+  }
+
+  def userWalletPath: String = {
+    return StringUtils.concatPath(chainDirectoryPath, "wallet.json")
   }
 
   def main(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
     val account1 = GlobalAccountState.newAccount()
-    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, "123456789")
+    val password = "12345"
+    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, password)
+    KeyFileController.readKeyFile(password)
   }
 
   def testTransactions(args: Array[String]): Unit = {

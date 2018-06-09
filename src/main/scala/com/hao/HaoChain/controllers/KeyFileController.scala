@@ -1,6 +1,6 @@
 package com.hao.HaoChain.controllers
 
-import java.security.{MessageDigest, PrivateKey, PublicKey, SecureRandom}
+import java.security._
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -9,6 +9,9 @@ import java.io.PrintWriter
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter
 
 import com.google.gson.GsonBuilder
+import com.google.gson.stream.JsonReader
+import java.io.FileReader
+
 import com.hao.HaoChain.controllers.KeyFileController.generateSafeToken
 import com.hao.HaoChain.core.{HaoChain, StringUtils}
 
@@ -80,7 +83,12 @@ object KeyFileController {
   }
 
   def readKeyFile(password: String): Unit = {
-
+    val filename = HaoChain.userWalletPath
+    val reader = new JsonReader(new FileReader(filename))
+    val keyFile: KeyFile = new GsonBuilder().create().fromJson(reader, classOf[KeyFile])
+    val publicKey: Key = StringUtils.getKeyFromString(keyFile.publicKey)
+    println(keyFile.publicKey)
+    println(StringUtils.getStringFromKey(publicKey))
   }
 
 }
