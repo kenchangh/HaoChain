@@ -1,18 +1,38 @@
 package com.hao.HaoChain.core
 
+import java.io.File
 import java.security.Security
 
+import com.hao.HaoChain.controllers.KeyFileController
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
 class HaoChain extends Blockchain {
   difficulty = 3
+  HaoChain.createChainDirectory()
 }
 
 object HaoChain {
+  Security.addProvider(new BouncyCastleProvider())
+
+  def createChainDirectory() = {
+    val chainDir = chainDirectoryPath
+    new File(chainDir).mkdirs()
+  }
+
+  def chainDirectoryPath: String = {
+    val homeDir = System.getProperty("user.home")
+    return new File(homeDir, "/haochain").toString()
+  }
 
   def main(args: Array[String]): Unit = {
-    Security.addProvider(new BouncyCastleProvider())
+    var haochain = new HaoChain()
+    var globalAccountState = GlobalAccountState.initialize()
+    val account1 = GlobalAccountState.newAccount()
+    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, "123456789")
+  }
+
+  def testTransactions(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
 
@@ -41,30 +61,30 @@ object HaoChain {
   }
 
   def miningTest(args: Array[String]): Unit = {
-//    var hash: String = ""
-//    var blockchain: com.hao.HaoChain.core.HaoChain = new com.hao.HaoChain.core.HaoChain()
-//
-//    var startTime: Long = System.currentTimeMillis()
-//    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
-//    hash = blockchain.blocks(0).mineBlock(blockchain.difficulty)
-//    var endTime: Long = System.currentTimeMillis()
-//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-//
-//    startTime = System.currentTimeMillis()
-//    blockchain.blocks.append(
-//      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Second block"))
-//    blockchain.blocks(1).mineBlock(blockchain.difficulty)
-//    endTime = System.currentTimeMillis()
-//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-//
-//    startTime = System.currentTimeMillis()
-//    blockchain.blocks.append(
-//      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Third block"))
-//    blockchain.blocks(2).mineBlock(blockchain.difficulty)
-//    endTime = System.currentTimeMillis()
-//    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
-//
-//    blockchain.printBlockchain()
+    var hash: String = ""
+    var blockchain: com.hao.HaoChain.core.HaoChain = new com.hao.HaoChain.core.HaoChain()
+
+    var startTime: Long = System.currentTimeMillis()
+    blockchain.blocks.append(new Block(GenesisBlock.GENESIS_HASH, "First block"))
+    hash = blockchain.blocks(0).mineBlock(blockchain.difficulty)
+    var endTime: Long = System.currentTimeMillis()
+    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+
+    startTime = System.currentTimeMillis()
+    blockchain.blocks.append(
+      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Second block"))
+    blockchain.blocks(1).mineBlock(blockchain.difficulty)
+    endTime = System.currentTimeMillis()
+    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+
+    startTime = System.currentTimeMillis()
+    blockchain.blocks.append(
+      new Block(blockchain.blocks(blockchain.blocks.length - 1).hash, "Third block"))
+    blockchain.blocks(2).mineBlock(blockchain.difficulty)
+    endTime = System.currentTimeMillis()
+    println("Block " + hash + "mined in: " + (endTime - startTime).toString)
+
+    blockchain.printBlockchain()
   }
 }
 

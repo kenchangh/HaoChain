@@ -1,5 +1,6 @@
 package com.hao.HaoChain.core
 
+import java.io.File
 import java.security._
 import java.util.Base64
 
@@ -22,6 +23,10 @@ object StringUtils {
       }
     }
     return hexString.toString
+  }
+
+  def concatPath(path1: String, path2: String): String = {
+    return new File(path1, path2).toString
   }
 
   def getKeyFromString(key: Key): String = {
