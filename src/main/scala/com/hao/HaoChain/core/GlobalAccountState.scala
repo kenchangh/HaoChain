@@ -16,7 +16,7 @@ object GlobalAccountState {
   }
 
   def addAccount(account: Account) = {
-    val publicKey = StringUtils.getKeyFromString(account.publicKey)
+    val publicKey = StringUtils.getStringFromKey(account.publicKey)
     val freshAccountState = new AccountState()
     instance.accounts += (publicKey -> freshAccountState)
   }
@@ -32,7 +32,7 @@ object GlobalAccountState {
   }
 
   def getBalance(account: Account): Float = {
-    val accountState: AccountState = instance.accounts(StringUtils.getKeyFromString(account.publicKey))
+    val accountState: AccountState = instance.accounts(StringUtils.getStringFromKey(account.publicKey))
     return accountState.balance
   }
 }

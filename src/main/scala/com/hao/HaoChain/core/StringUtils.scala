@@ -2,7 +2,9 @@ package com.hao.HaoChain.core
 
 import java.io.File
 import java.security._
+import java.security.spec.{ECPublicKeySpec, KeySpec}
 import java.util.Base64
+import javax.crypto.spec.SecretKeySpec
 
 object StringUtils {
   def sha256(string: String): String = {
@@ -29,9 +31,15 @@ object StringUtils {
     return new File(path1, path2).toString
   }
 
-  def getKeyFromString(key: Key): String = {
+  def getStringFromKey(key: Key): String = {
     return Base64.getEncoder.encodeToString(key.getEncoded)
   }
+
+//  def getKeyFromString(string: String): Key = {
+//    val keyBytes = Base64.getDecoder.decode(string)
+//    val key = new SecretKeySpec(keyBytes,0,keyBytes.length,"ECDSA")
+//    return key
+//  }
 
   def applyECDSASig(privateKey: PrivateKey, input: String): Array[Byte] = {
     var dsa: Signature = null

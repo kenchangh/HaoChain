@@ -63,8 +63,8 @@ object KeyFileController {
   }
 
   def writeKeyFile(publicKey: PublicKey, privateKey: PrivateKey, password: String) = {
-    val publicKeyStr = StringUtils.getKeyFromString(publicKey)
-    val privateKeyStr = StringUtils.getKeyFromString(privateKey)
+    val publicKeyStr = StringUtils.getStringFromKey(publicKey)
+    val privateKeyStr = StringUtils.getStringFromKey(privateKey)
     val initVector = generateSafeToken()
 
     // AES key has to be 16/32/64 bytes, so we have to MD5 the password first, get the first half of the hash
@@ -77,6 +77,10 @@ object KeyFileController {
     val writer = new PrintWriter(keyFilePath, "UTF-8")
     writer.println(keyFileJson)
     writer.close()
+  }
+
+  def readKeyFile(password: String): Unit = {
+
   }
 
 }

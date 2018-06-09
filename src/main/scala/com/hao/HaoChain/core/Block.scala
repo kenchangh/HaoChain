@@ -37,8 +37,8 @@ class Block(val previousHash: String, val data: String) {
     if (transaction == null) {
       return false
     }
-    val senderPublicKey = StringUtils.getKeyFromString(transaction.senderKey)
-    val recipientPublicKey = StringUtils.getKeyFromString(transaction.recipientKey)
+    val senderPublicKey = StringUtils.getStringFromKey(transaction.senderKey)
+    val recipientPublicKey = StringUtils.getStringFromKey(transaction.recipientKey)
     val senderAccountState = GlobalAccountState.getAccountState(senderPublicKey)
     val recipientAccountState = GlobalAccountState.getAccountState(recipientPublicKey)
     if (previousHash != GenesisBlock.GENESIS_HASH) {

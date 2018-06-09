@@ -23,8 +23,8 @@ class Transaction(val sender: Account, val recipient: Account,
 
   def calculateHash(): String = {
     return StringUtils.sha256(
-      StringUtils.getKeyFromString(senderKey) +
-        StringUtils.getKeyFromString(recipientKey) +
+      StringUtils.getStringFromKey(senderKey) +
+        StringUtils.getStringFromKey(recipientKey) +
         value.toString +
         nonce.toString
     )
@@ -39,15 +39,15 @@ class Transaction(val sender: Account, val recipient: Account,
   }
 
   def generateSignature(privateKey: PrivateKey): Array[Byte] = {
-    val data: String = StringUtils.getKeyFromString(senderKey) +
-      StringUtils.getKeyFromString(recipientKey) + value.toString
+    val data: String = StringUtils.getStringFromKey(senderKey) +
+      StringUtils.getStringFromKey(recipientKey) + value.toString
     signature = StringUtils.applyECDSASig(privateKey, data)
     return signature
   }
 
   def verifySignature(): Boolean = {
-    val data: String = StringUtils.getKeyFromString(senderKey) +
-      StringUtils.getKeyFromString(recipientKey) + value.toString
+    val data: String = StringUtils.getStringFromKey(senderKey) +
+      StringUtils.getStringFromKey(recipientKey) + value.toString
     return StringUtils.verifyECDSASig(senderKey, data, signature)
   }
 }
