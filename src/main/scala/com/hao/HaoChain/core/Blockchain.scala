@@ -1,10 +1,9 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
 import java.util.Base64
 
 import com.google.gson.GsonBuilder
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -25,7 +24,8 @@ class Blockchain {
           StringUtils.getKeyFromString(tx.recipientKey),
           tx.value,
           Base64.getEncoder.encodeToString(tx.signature),
-          tx.nonce
+          tx.nonce,
+          tx.transactionId
         )
         txJSONArray(txIdx) = txJSON
       }

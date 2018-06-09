@@ -1,11 +1,9 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
-import java.math
-import java.math.BigInteger
-import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey, SecureRandom}
+import java.security._
 import java.security.spec.ECGenParameterSpec
 
-import com.google.gson.{Gson, GsonBuilder}
+import com.google.gson.GsonBuilder
 
 class AccountState(val balance: Float, val nonce: Int) {
 

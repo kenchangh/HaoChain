@@ -1,4 +1,4 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
 object GenesisBlock {
 

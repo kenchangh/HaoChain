@@ -1,7 +1,6 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
 import java.security._
-import java.math.BigInteger
 import java.util.Base64
 
 object StringUtils {

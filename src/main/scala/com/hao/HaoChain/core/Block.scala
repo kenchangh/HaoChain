@@ -1,8 +1,7 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
 import java.util.Date
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable.ArrayBuffer
 
 class BlockJSON(val timestamp: Long, val hash: String, val transactions: Array[TransactionJSON])
@@ -33,6 +32,7 @@ class Block(val previousHash: String, val data: String) {
     return hash
   }
 
+
   def addTransaction(transaction: Transaction): Boolean = {
     if (transaction == null) {
       return false
@@ -50,7 +50,7 @@ class Block(val previousHash: String, val data: String) {
         println("Spending more than account balance")
         return false
       }
-      if (transaction.sender.nonce != senderAccountState.nonce) {
+      if (transaction.nonce != senderAccountState.nonce) {
         println("Nonce does not match, double spend")
         return false
       }

@@ -1,6 +1,4 @@
-package com.hao.HaoChain
-
-import java.security.PublicKey
+package com.hao.HaoChain.core
 
 import scala.collection.immutable.HashMap
 

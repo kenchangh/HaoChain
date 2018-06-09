@@ -1,12 +1,10 @@
-package com.hao.HaoChain
+package com.hao.HaoChain.core
 
-import java.math.BigInteger
-import java.security.{PrivateKey, PublicKey}
-
-import scala.collection.mutable.ArrayBuffer
+import java.security.PrivateKey
 
 class TransactionJSON(val sender: String, val recipient: String,
-                      val value: Float, val signature: String, val nonce: Int)
+                      val value: Float, val signature: String,
+                      val nonce: Int, val transactionId: String)
 
 trait GenericTransaction {
   val sender: Account
@@ -17,11 +15,11 @@ trait GenericTransaction {
 
 class Transaction(val sender: Account, val recipient: Account,
                   val value: Float, val nonce: Int) extends GenericTransaction {
-  val outputs = ArrayBuffer[Int]()
   var signature: Array[Byte] = null
 
   val senderKey = sender.publicKey
   val recipientKey = recipient.publicKey
+  val transactionId: String = calculateHash()
 
   def calculateHash(): String = {
     return StringUtils.sha256(
