@@ -4,7 +4,7 @@ import com.hao.HaoChain._
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
-class HaoChain extends Blockchain with GlobalAccountState {
+class HaoChain extends Blockchain {
   difficulty = 3
 }
 
@@ -13,24 +13,27 @@ object HaoChain {
   def main(args: Array[String]): Unit = {
     Security.addProvider(new BouncyCastleProvider())
     var haochain = new HaoChain()
+    var globalAccountState = GlobalAccountState.initialize()
 
-    val coinbase = haochain.newAccount()
-    val account1 = haochain.newAccount()
-    val account2 = haochain.newAccount()
+    val coinbase = GlobalAccountState.newAccount()
+    val account1 = GlobalAccountState.newAccount()
+    val account2 = GlobalAccountState.newAccount()
 
     // Genesis block
     val genesisTransaction = new Transaction(coinbase, account1, 100, coinbase.nonce)
     genesisTransaction.generateSignature(coinbase.privateKey)
-    val genesisBlock: Block = new Block(
-      haochain.accounts, GenesisBlock.GENESIS_HASH, GenesisBlock.GENESIS_DATA)
+    val genesisBlock: Block = new Block(GenesisBlock.GENESIS_HASH, GenesisBlock.GENESIS_DATA)
     genesisBlock.addTransaction(genesisTransaction)
     haochain.addBlock(genesisBlock)
     haochain.printBlockchain()
+//    println(GlobalAccountState.instance.accounts.toString())
 
     // 1st block
-    val block1 = new Block(haochain.accounts, genesisBlock.hash, "Block 1")
+    val block1 = new Block(genesisBlock.hash, "Block 1")
     block1.addTransaction(account1.transfer(account2, 20, account1.nonce))
+//    println(GlobalAccountState.instance.accounts.toString())
     block1.addTransaction(account2.transfer(account1, 10, account2.nonce))
+//    println(GlobalAccountState.instance.accounts.toString())
     haochain.addBlock(block1)
     haochain.printBlockchain()
   }

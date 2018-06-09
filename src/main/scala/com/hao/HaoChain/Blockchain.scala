@@ -7,26 +7,6 @@ import com.google.gson.GsonBuilder
 import scala.collection.immutable.HashMap
 import scala.collection.mutable.ArrayBuffer
 
-trait GlobalAccountState {
-  var accounts: HashMap[String, AccountState] = new HashMap[String, AccountState]()
-
-  def addAccount(account: Account) = {
-    val publicKey= StringUtils.getKeyFromString(account.publicKey)
-    val freshAccountState = new AccountState()
-    accounts += (publicKey -> freshAccountState)
-  }
-
-  def newAccount(): Account = {
-    val account = new Account()
-    addAccount(account)
-    return account
-  }
-
-  def getBalance(account: Account): Float = {
-    val accountState: AccountState = accounts(StringUtils.getKeyFromString(account.publicKey))
-    return accountState.balance
-  }
-}
 
 class Blockchain {
   val blocks: ArrayBuffer[Block] = ArrayBuffer()
@@ -47,7 +27,7 @@ class Blockchain {
           Base64.getEncoder.encodeToString(tx.signature),
           tx.nonce
         )
-        txJSONArray(idx) = txJSON
+        txJSONArray(txIdx) = txJSON
       }
 
       val blockJSON = new BlockJSON(block.timestamp, block.hash, txJSONArray)

@@ -43,6 +43,8 @@ class Account extends PublicKeyCryptoWallet {
   }
 
   def transfer(recipient: Account, value: Float, nonce: Int): Transaction = {
-    return new Transaction(this, recipient, value, nonce)
+    val transaction = new Transaction(this, recipient, value, nonce)
+    transaction.generateSignature(privateKey)
+    return transaction
   }
 }
