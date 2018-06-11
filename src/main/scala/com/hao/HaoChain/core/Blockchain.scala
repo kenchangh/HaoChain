@@ -20,8 +20,8 @@ class Blockchain {
       for (txIdx <- 0 to block.transactions.length - 1) {
         val tx = block.transactions(txIdx)
         val txJSON = new TransactionJSON(
-          StringUtils.getStringFromKey(tx.senderKey),
-          StringUtils.getStringFromKey(tx.recipientKey),
+          StringUtils.getStringFromKey(tx.sender),
+          StringUtils.getStringFromKey(tx.recipient),
           tx.value,
           Base64.getEncoder.encodeToString(tx.signature),
           tx.nonce,

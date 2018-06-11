@@ -19,6 +19,14 @@ trait PublicKeyCryptoWallet {
   var publicKey: PublicKey
 }
 
+object Account {
+  def fromKeypair(publicKey: PublicKey, privateKey: PrivateKey): Account = {
+    val publicKeyStr = StringUtils.getStringFromKey(publicKey)
+    val accountState = GlobalAccountState.getAccountState(publicKeyStr)
+    new Account(publicKey, privateKey, accountState.nonce)
+  }
+}
+
 class Account extends PublicKeyCryptoWallet {
 
   val keyPair: KeyPair = generateKeyPair()
@@ -47,8 +55,8 @@ class Account extends PublicKeyCryptoWallet {
     return keyPair
   }
 
-  def transfer(recipient: Account, value: Float, nonce: Int): Transaction = {
-    val transaction = new Transaction(this, recipient, value, nonce)
+  def transfer(recipient: PublicKey, value: Float, nonce: Int): Transaction = {
+    val transaction = new Transaction(this.publicKey, recipient, value, nonce)
     transaction.generateSignature(privateKey)
     return transaction
   }

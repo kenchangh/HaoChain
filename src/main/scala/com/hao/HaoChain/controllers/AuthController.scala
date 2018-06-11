@@ -11,9 +11,6 @@ object AuthController {
 
   def loginAccount(password: String): Account = {
     val (publicKey, privateKey) = KeyFileController.readKeyFile(password)
-    val publicKeyStr = StringUtils.getStringFromKey(publicKey)
-    val accountState = GlobalAccountState.getAccountState(publicKeyStr)
-    val account = new Account(publicKey, privateKey, accountState.nonce)
-    account
+    Account.fromKeypair(publicKey, privateKey)
   }
 }

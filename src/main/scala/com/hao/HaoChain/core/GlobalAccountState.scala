@@ -79,7 +79,7 @@ object GlobalAccountState {
   def newAccount(): Account = {
     val account = new Account()
     addAccount(account)
-    return account
+    account
   }
 
   def getAccountState(key: String): AccountState = {

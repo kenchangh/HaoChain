@@ -29,14 +29,14 @@ object HaoChain {
     return StringUtils.concatPath(chainDirectoryPath, "wallet.json")
   }
 
-  def main(args: Array[String]): Unit = {
-    var haochain = new HaoChain()
-    var globalAccountState = GlobalAccountState.initialize()
-//    AuthController.registerAccount("12345")
-    val account = AuthController.loginAccount("12345")
-  }
+//  def main(args: Array[String]): Unit = {
+//    var haochain = new HaoChain()
+//    var globalAccountState = GlobalAccountState.initialize()
+////    AuthController.registerAccount("12345")
+//    val account = AuthController.loginAccount("12345")
+//  }
 
-  def testTransactions(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
 
@@ -45,7 +45,7 @@ object HaoChain {
     val account2 = GlobalAccountState.newAccount()
 
     // Genesis block
-    val genesisTransaction = new Transaction(coinbase, account1, 100, coinbase.nonce)
+    val genesisTransaction = new Transaction(coinbase.publicKey, account1.publicKey, 100, coinbase.nonce)
     genesisTransaction.generateSignature(coinbase.privateKey)
     val genesisBlock: Block = new Block(GenesisBlock.GENESIS_HASH, GenesisBlock.GENESIS_DATA)
     genesisBlock.addTransaction(genesisTransaction)
@@ -53,13 +53,13 @@ object HaoChain {
 
     // 1st block
     val block1 = new Block(genesisBlock.hash, "Block 1")
-    block1.addTransaction(account1.transfer(account2, 20, account1.nonce))
-    block1.addTransaction(account2.transfer(account1, 10, account2.nonce))
+    block1.addTransaction(account1.transfer(account2.publicKey, 20, account1.nonce))
+    block1.addTransaction(account2.transfer(account1.publicKey, 10, account2.nonce))
     haochain.addBlock(block1)
 
     // 2nd block
     val block2 = new Block(block1.hash, "Block 2")
-    block2.addTransaction(account1.transfer(account2, 50, account1.nonce))
+    block2.addTransaction(account1.transfer(account2.publicKey, 50, account1.nonce+1))
     haochain.addBlock(block2)
     haochain.printBlockchain()
   }
