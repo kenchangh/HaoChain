@@ -3,7 +3,7 @@ package com.hao.HaoChain.core
 import java.io.File
 import java.security.{PrivateKey, PublicKey, Security}
 
-import com.hao.HaoChain.controllers.KeyFileController
+import com.hao.HaoChain.controllers.AuthController
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
@@ -32,11 +32,8 @@ object HaoChain {
   def main(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
-    val account1 = GlobalAccountState.newAccount()
-//    val account2 = GlobalAccountState.newAccount()
-//    val password = "12345"
-//    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, password)
-//    val (publicKey, privateKey)  = KeyFileController.readKeyFile(password)
+//    AuthController.registerAccount("12345")
+    val account = AuthController.loginAccount("12345")
   }
 
   def testTransactions(args: Array[String]): Unit = {

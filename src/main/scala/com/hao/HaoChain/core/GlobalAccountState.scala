@@ -38,7 +38,6 @@ object GlobalAccountState {
           StringUtils.writeToPath(accountsPath, "{}")
       }
     }
-    println(instance.accounts)
     instance
   }
 
