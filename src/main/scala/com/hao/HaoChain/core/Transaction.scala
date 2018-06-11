@@ -1,6 +1,6 @@
 package com.hao.HaoChain.core
 
-import java.security.PrivateKey
+import java.security.{PrivateKey, PublicKey}
 
 class TransactionJSON(val sender: String, val recipient: String,
                       val value: Float, val signature: String,
@@ -17,8 +17,8 @@ class Transaction(val sender: Account, val recipient: Account,
                   val value: Float, val nonce: Int) extends GenericTransaction {
   var signature: Array[Byte] = null
 
-  val senderKey = sender.publicKey
-  val recipientKey = recipient.publicKey
+  val senderKey: PublicKey = sender.publicKey
+  val recipientKey: PublicKey = recipient.publicKey
   val transactionId: String = calculateHash()
 
   def calculateHash(): String = {

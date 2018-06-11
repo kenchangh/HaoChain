@@ -33,9 +33,10 @@ object HaoChain {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
     val account1 = GlobalAccountState.newAccount()
-    val password = "12345"
-    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, password)
-    val (publicKey, privateKey)  = KeyFileController.readKeyFile(password)
+//    val account2 = GlobalAccountState.newAccount()
+//    val password = "12345"
+//    KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, password)
+//    val (publicKey, privateKey)  = KeyFileController.readKeyFile(password)
   }
 
   def testTransactions(args: Array[String]): Unit = {

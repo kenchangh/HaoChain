@@ -1,6 +1,6 @@
 package com.hao.HaoChain.core
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.security._
 import java.security.spec.{ECPublicKeySpec, KeySpec, PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.util.Base64
@@ -9,6 +9,13 @@ import java.security.KeyFactory
 import java.security.PublicKey
 
 object StringUtils {
+
+  def writeToPath(path: String, string: String): Unit = {
+    val writer = new PrintWriter(path, "UTF-8")
+    writer.println(string)
+    writer.close()
+  }
+
   def sha256(string: String): String = {
     val byteArray: Array[Byte] = MessageDigest.getInstance("SHA-256").digest(string.getBytes("UTF-8"))
     val hexString = new StringBuffer

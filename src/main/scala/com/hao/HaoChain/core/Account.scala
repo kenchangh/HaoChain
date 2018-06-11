@@ -26,6 +26,13 @@ class Account extends PublicKeyCryptoWallet {
   var publicKey = keyPair.getPublic
   var nonce = 0
 
+  /*
+  Construct from GlobalAccountState
+   */
+  def this(publicKey: PublicKey, privateKey: PrivateKey, nonce: Int) {
+    this()
+  }
+
   def generateKeyPair(): KeyPair = {
     val keyGen = KeyPairGenerator.getInstance("ECDSA", "BC")
     val random = SecureRandom.getInstance("SHA1PRNG")
