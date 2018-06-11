@@ -1,12 +1,13 @@
 package com.hao.HaoChain.core
 
-import java.io.FileReader
+import java.io.{File, FileReader, FileWriter, Writer}
+import java.lang.IllegalStateException
 
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson._
-import scala.collection.JavaConversions._
 
+import scala.collection.JavaConversions._
 import scala.collection.immutable.HashMap
 
 class GlobalAccountState {
@@ -27,7 +28,16 @@ object GlobalAccountState {
     */
   def initialize(): GlobalAccountState = {
     instance = new GlobalAccountState()
-    readAccountsFile()
+    val file = new File(accountsPath)
+    file.mkdir()
+    if (file.exists()) {
+      try {
+        readAccountsFile()
+      } catch {
+        case e: IllegalStateException =>
+          StringUtils.writeToPath(accountsPath, "{}")
+      }
+    }
     println(instance.accounts)
     instance
   }
