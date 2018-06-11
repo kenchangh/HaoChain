@@ -82,13 +82,14 @@ object KeyFileController {
     writer.close()
   }
 
-  def readKeyFile(password: String): Unit = {
+  def readKeyFile(password: String): (PublicKey, PrivateKey) = {
     val filename = HaoChain.userWalletPath
     val reader = new JsonReader(new FileReader(filename))
     val keyFile: KeyFile = new GsonBuilder().create().fromJson(reader, classOf[KeyFile])
-    val publicKey: Key = StringUtils.getKeyFromString(keyFile.publicKey)
-    println(keyFile.publicKey)
-    println(StringUtils.getStringFromKey(publicKey))
+    val publicKey = StringUtils.getPublicKeyFromString(keyFile.publicKey)
+    val decryptedPrivateKey = AESEncryptor.decrypt(password, keyFile.initVector, keyFile.encryptedPrivateKey)
+    val privateKey = StringUtils.getPrivateKeyFromString(decryptedPrivateKey)
+    return (publicKey, privateKey)
   }
 
 }

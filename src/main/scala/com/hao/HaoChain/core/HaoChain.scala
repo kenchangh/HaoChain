@@ -1,7 +1,7 @@
 package com.hao.HaoChain.core
 
 import java.io.File
-import java.security.Security
+import java.security.{PrivateKey, PublicKey, Security}
 
 import com.hao.HaoChain.controllers.KeyFileController
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -35,7 +35,7 @@ object HaoChain {
     val account1 = GlobalAccountState.newAccount()
     val password = "12345"
     KeyFileController.writeKeyFile(account1.publicKey, account1.privateKey, password)
-    KeyFileController.readKeyFile(password)
+    val (publicKey, privateKey)  = KeyFileController.readKeyFile(password)
   }
 
   def testTransactions(args: Array[String]): Unit = {

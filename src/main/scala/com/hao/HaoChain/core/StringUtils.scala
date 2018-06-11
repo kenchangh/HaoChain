@@ -2,9 +2,11 @@ package com.hao.HaoChain.core
 
 import java.io.File
 import java.security._
-import java.security.spec.{ECPublicKeySpec, KeySpec}
+import java.security.spec.{ECPublicKeySpec, KeySpec, PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.util.Base64
 import javax.crypto.spec.SecretKeySpec
+import java.security.KeyFactory
+import java.security.PublicKey
 
 object StringUtils {
   def sha256(string: String): String = {
@@ -35,10 +37,18 @@ object StringUtils {
     return Base64.getEncoder.encodeToString(key.getEncoded)
   }
 
-  def getKeyFromString(string: String): Key = {
-    val keyBytes = Base64.getDecoder.decode(string)
-    val key = new SecretKeySpec(keyBytes,0,keyBytes.length,"ECDSA")
-    return key
+  def getPublicKeyFromString(string: String): PublicKey = {
+    val bytes = Base64.getDecoder.decode(string)
+    val keyFactory = KeyFactory.getInstance("ECDSA")
+    val keySpec = new X509EncodedKeySpec(bytes)
+    return keyFactory.generatePublic(keySpec)
+  }
+
+  def getPrivateKeyFromString(string: String): PrivateKey = {
+    val bytes = Base64.getDecoder.decode(string)
+    val keyFactory = KeyFactory.getInstance("ECDSA")
+    val keySpec = new PKCS8EncodedKeySpec(bytes)
+    return keyFactory.generatePrivate(keySpec)
   }
 
   def applyECDSASig(privateKey: PrivateKey, input: String): Array[Byte] = {
