@@ -53,13 +53,14 @@ object HaoChain {
 
     // 1st block
     val block1 = new Block(genesisBlock.hash, "Block 1")
-    block1.addTransaction(account1.transfer(account2.publicKey, 20, account1.nonce))
-    block1.addTransaction(account2.transfer(account1.publicKey, 10, account2.nonce))
+    block1.addTransaction(account1.transfer(account2.publicKey, 20, account1.nonce+1))
     haochain.addBlock(block1)
 
     // 2nd block
     val block2 = new Block(block1.hash, "Block 2")
-    block2.addTransaction(account1.transfer(account2.publicKey, 50, account1.nonce+1))
+    block2.addTransaction(account2.transfer(account1.publicKey, 10, account2.nonce+1))
+    block2.addTransaction(account1.transfer(account2.publicKey, 40, account2.nonce+1))
+//    block2.addTransaction(account1.transfer(account2.publicKey, 50, account1.nonce+1))
     haochain.addBlock(block2)
     haochain.printBlockchain()
   }

@@ -2,10 +2,12 @@ package com.hao.HaoChain.views
 
 import com.hao.HaoChain.HaoChainWallet.{appStyles, loginStyles}
 
+import scalafx.event.{ActionEvent, Event}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.control.PasswordField
 import scalafx.scene.effect.DropShadow
+import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.paint.Color.{Cyan, DodgerBlue}
 import scalafx.scene.paint.{LinearGradient, Stops}

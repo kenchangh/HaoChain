@@ -23,46 +23,85 @@ class Block(val previousHash: String, val data: String) {
       previousHash + timestamp.toString + nonce.toString + data)
   }
 
+  def processTransactionInBlock(transaction: Transaction): Unit = {
+    val senderPublicKey = StringUtils.getStringFromKey(transaction.sender)
+    val recipientPublicKey = StringUtils.getStringFromKey(transaction.recipient)
+    val senderAccountState = GlobalAccountState.getAccountState(senderPublicKey)
+    val recipientAccountState = GlobalAccountState.getAccountState(recipientPublicKey)
+
+    if (!isTransactionValid(transaction)) {
+      return
+    }
+    //    val senderNewNonce = senderAccountState.nonce + 1
+    val senderNewBalance = senderAccountState.balance - transaction.value
+    val recipientNewBalance = recipientAccountState.balance + transaction.value
+    GlobalAccountState.instance.accounts += (
+      senderPublicKey -> new AccountState(senderNewBalance, senderAccountState.nonce),
+      recipientPublicKey -> new AccountState(recipientNewBalance, recipientAccountState.nonce),
+    )
+  }
+
   def mineBlock(difficulty: Int): String = {
     val target: String = "0" * difficulty
     while (hash.substring(0, difficulty) != target) {
       nonce += 1
       hash = calculateHash()
     }
+
+    for (transaction <- transactions) {
+      processTransactionInBlock(transaction)
+    }
+
     return hash
   }
 
-
-  def addTransaction(transaction: Transaction): Boolean = {
+  // how can you check the validity of the transaction
+  // if the user's nonce cannot be checked at Point in Time
+  // because right now it's checking the GlobalAccountState, which is the most updated state
+  def isTransactionValid(transaction: Transaction): Boolean = {
     if (transaction == null) {
       return false
     }
-    val senderPublicKey = StringUtils.getStringFromKey(transaction.sender)
     val recipientPublicKey = StringUtils.getStringFromKey(transaction.recipient)
+    val senderPublicKey = StringUtils.getStringFromKey(transaction.sender)
     val senderAccountState = GlobalAccountState.getAccountState(senderPublicKey)
-    val recipientAccountState = GlobalAccountState.getAccountState(recipientPublicKey)
     if (previousHash != GenesisBlock.GENESIS_HASH) {
       if (!transaction.isValidTransaction) {
         println("Transaction failed to process.")
+        return false
+      }
+
+      if (senderPublicKey == recipientPublicKey) {
+        println("Recipient address cannot be the same as sender")
         return false
       }
       if (transaction.value > senderAccountState.balance) {
         println("Spending more than account balance")
         return false
       }
-      if (transaction.nonce != senderAccountState.nonce) {
+      if (transaction.nonce <= senderAccountState.nonce) {
+        println(transaction.nonce, senderAccountState.nonce)
         println("Nonce does not match, double spend")
         return false
       }
     }
+    true
+  }
+
+  /**
+    * This adds the transaction into the 'mempool'. Which is a list of transactions to
+    * be added into the next block
+    * @param transaction
+    */
+  def addTransaction(transaction: Transaction): Unit = {
+    val senderPublicKey = StringUtils.getStringFromKey(transaction.sender)
+    val recipientPublicKey = StringUtils.getStringFromKey(transaction.recipient)
+    val senderAccountState = GlobalAccountState.getAccountState(senderPublicKey)
+    val recipientAccountState = GlobalAccountState.getAccountState(recipientPublicKey)
+
+    if (!isTransactionValid(transaction)) {
+      return
+    }
     transactions.append(transaction)
-    val senderNewNonce = senderAccountState.nonce + 1
-    val senderNewBalance = senderAccountState.balance - transaction.value
-    val recipientNewBalance = recipientAccountState.balance + transaction.value
-    GlobalAccountState.instance.accounts += (
-      senderPublicKey -> new AccountState(senderNewBalance, senderNewNonce),
-      recipientPublicKey -> new AccountState(recipientNewBalance, recipientAccountState.nonce),
-    )
-    return true
   }
 }
