@@ -1,6 +1,9 @@
 package com.hao.HaoChain.core
 
 import java.security.{PrivateKey, PublicKey}
+import java.util.Base64
+
+import com.google.gson.{Gson, GsonBuilder}
 
 class TransactionJSON(val sender: String, val recipient: String,
                       val value: Float, val signature: String,
@@ -13,11 +16,48 @@ trait GenericTransaction {
   var signature: Array[Byte]
 }
 
+object Transaction {
+  def toTransactionJSON(tx: Transaction): TransactionJSON = {
+    val txJSON = new TransactionJSON(
+      StringUtils.getStringFromKey(tx.sender),
+      StringUtils.getStringFromKey(tx.recipient),
+      tx.value,
+      Base64.getEncoder.encodeToString(tx.signature),
+      tx.nonce,
+      tx.transactionId
+    )
+    return txJSON
+  }
+
+  def fromTransactionJSON(txJSON: TransactionJSON): Transaction = {
+    val senderPublicKey = StringUtils.getPublicKeyFromString(txJSON.sender)
+    val recipientPublicKey = StringUtils.getPublicKeyFromString(txJSON.recipient)
+    val txn = new Transaction(
+       senderPublicKey, recipientPublicKey, txJSON.value, txJSON.nonce
+    )
+    txn.signature = txJSON.signature.getBytes
+    txn.transactionId = txJSON.transactionId
+    return txn
+  }
+
+  def serializeToJSON(tx: Transaction): String = {
+    val txJSON = Transaction.toTransactionJSON(tx)
+    val jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(txJSON)
+    return jsonString
+  }
+
+  def deserializeFromJSON(jsonString: String): Transaction = {
+    val gson = new Gson();
+    val txn = gson.fromJson(jsonString, classOf[Transaction])
+    return txn
+  }
+}
+
 class Transaction(val sender: PublicKey, val recipient: PublicKey,
                   val value: Float, val nonce: Int) extends GenericTransaction {
   var signature: Array[Byte] = null
 
-  val transactionId: String = calculateHash()
+  var transactionId: String = calculateHash()
 
   def calculateHash(): String = {
     return StringUtils.sha256(

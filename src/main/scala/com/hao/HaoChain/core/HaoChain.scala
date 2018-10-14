@@ -4,11 +4,12 @@ import java.io.File
 import java.security.{PrivateKey, PublicKey, Security}
 
 import com.hao.HaoChain.controllers.AuthController
+import com.hao.HaoChain.networking.{UDPClient, UDPServer}
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
 class HaoChain extends Blockchain {
-  difficulty = 3
+  difficulty = 1
   HaoChain.createChainDirectory()
 }
 
@@ -29,20 +30,22 @@ object HaoChain {
     return StringUtils.concatPath(chainDirectoryPath, "wallet.json")
   }
 
-//  def main(args: Array[String]): Unit = {
-//    var haochain = new HaoChain()
-//    var globalAccountState = GlobalAccountState.initialize()
-////    AuthController.registerAccount("12345")
-//    val account = AuthController.loginAccount("12345")
-//  }
+  //  def main(args: Array[String]): Unit = {
+  //    var haochain = new HaoChain()
+  //    var globalAccountState = GlobalAccountState.initialize()
+  ////    AuthController.registerAccount("12345")
+  //    val account = AuthController.loginAccount("12345")
+  //  }
 
-  def blockchainTest(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
 
     val coinbase = GlobalAccountState.newAccount()
     val account1 = GlobalAccountState.newAccount()
     val account2 = GlobalAccountState.newAccount()
+
+    val account1PublicKeyStr = StringUtils.getStringFromKey(account1.publicKey)
 
     // Genesis block
     val genesisTransaction = new Transaction(coinbase.publicKey, account1.publicKey, 100, coinbase.nonce)
@@ -51,18 +54,22 @@ object HaoChain {
     genesisBlock.addTransaction(genesisTransaction)
     haochain.addBlock(genesisBlock)
 
+    val message = Block.serializeToJSON(genesisBlock)
+    //    udpClient.sendMessage(message)
+
     // 1st block
     val block1 = new Block(genesisBlock.hash, "Block 1")
-    block1.addTransaction(account1.transfer(account2.publicKey, 20, account1.nonce+1))
+    block1.addTransaction(account1.transfer(account2.publicKey, 20, account1.nonce + 1))
     haochain.addBlock(block1)
 
     // 2nd block
     val block2 = new Block(block1.hash, "Block 2")
-    block2.addTransaction(account2.transfer(account1.publicKey, 10, account2.nonce+1))
-    block2.addTransaction(account1.transfer(account2.publicKey, 40, account2.nonce+1))
-//    block2.addTransaction(account1.transfer(account2.publicKey, 50, account1.nonce+1))
+    block2.addTransaction(account2.transfer(account1.publicKey, 10, account2.nonce + 1))
+    block2.addTransaction(account1.transfer(account2.publicKey, 40, account2.nonce + 1))
+    //    block2.addTransaction(account1.transfer(account2.publicKey, 50, account1.nonce+1))
     haochain.addBlock(block2)
-    haochain.printBlockchain()
+
+    //    haochain.printBlockchain()
   }
 
   def miningTest(args: Array[String]): Unit = {

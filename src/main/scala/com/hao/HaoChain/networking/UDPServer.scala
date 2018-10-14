@@ -1,21 +1,29 @@
 package com.hao.HaoChain.networking
 
-
 import java.net._
 import java.io._
+
 object UDPServer extends App {
+  val udpServer = new UDPServer("test")
+}
+
+class UDPServer(val nodeId: String) {
+  val bufferSize = 1000
+  val port = 6789
   var aSocket: Option[DatagramSocket] = None
   try {
-    aSocket = Some(new DatagramSocket(6789))
-    val buffer: Array[Byte] = Array.ofDim[Byte](1000)
+    aSocket = Some(new DatagramSocket(port))
+    val buffer: Array[Byte] = Array.ofDim[Byte](bufferSize)
+    println("Server running on port "+ port.toString)
+
     while (true) {
       val request: DatagramPacket = new DatagramPacket(buffer, buffer.length)
       aSocket.get.receive(request)
       val requestStr = new String(request.getData()).trim()
-      val newStr = requestStr.concat("testing")
-      val newStrBytes = newStr.getBytes()
-      val reply: DatagramPacket = new DatagramPacket(newStrBytes,
-        newStrBytes.length, request.getAddress(), request.getPort())
+      println("Received message: "+requestStr+"\n")
+      val requestBytes = requestStr.getBytes()
+      val reply: DatagramPacket = new DatagramPacket(requestBytes,
+        requestBytes.length, request.getAddress(), request.getPort())
       aSocket.get.send(reply)
     }
   } catch {

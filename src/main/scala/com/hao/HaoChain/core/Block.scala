@@ -3,35 +3,48 @@ package com.hao.HaoChain.core
 import java.util.{Base64, Date}
 
 import com.google.gson.{Gson, GsonBuilder}
+import com.hao.HaoChain.models.NewTxnMessage
+import com.hao.HaoChain.networking.UDPClient
 
 import scala.collection.mutable.ArrayBuffer
 
-class BlockJSON(val timestamp: Long, val hash: String,
-                val nonce: Int, val transactions: Array[TransactionJSON])
+class BlockJSON(val timestamp: Long, val previousHash: String, val hash: String,
+                val nonce: Int, val transactions: Array[TransactionJSON], val data: String)
 
 object Block {
-  def serializeToJson(block: Block): String = {
+
+  def toBlockJson(block: Block): BlockJSON = {
     val txJSONArray: Array[TransactionJSON] = new Array[TransactionJSON](block.transactions.size)
     for (txIdx <- 0 to block.transactions.length - 1) {
       val tx = block.transactions(txIdx)
-      val txJSON = new TransactionJSON(
-        StringUtils.getStringFromKey(tx.sender),
-        StringUtils.getStringFromKey(tx.recipient),
-        tx.value,
-        Base64.getEncoder.encodeToString(tx.signature),
-        tx.nonce,
-        tx.transactionId
-      )
+      val txJSON = Transaction.toTransactionJSON(tx)
       txJSONArray(txIdx) = txJSON
     }
 
-    val blockJSON = new BlockJSON(block.timestamp, block.hash, block.nonce, txJSONArray)
-    return new GsonBuilder().setPrettyPrinting().create().toJson(blockJSON)
+    val blockJSON = new BlockJSON(
+      block.timestamp, block.previousHash,
+      block.hash, block.nonce, txJSONArray, block.data)
+    return blockJSON
   }
 
-  def deserializeFromJson(jsonString: String): Block = {
-    val gson = new Gson();
-    val block = gson.fromJson(jsonString, classOf[Block])
+  def serializeToJSON(block: Block): String = {
+    val blockJSON = Block.toBlockJson(block)
+    val jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(blockJSON)
+    return jsonString
+  }
+
+  def deserializeFromJSON(jsonString: String): Block = {
+    val gson = new Gson()
+    val blockJSON = gson.fromJson(jsonString, classOf[BlockJSON])
+    val block = new Block(blockJSON.previousHash, blockJSON.data)
+    block.hash = blockJSON.hash
+    block.timestamp = blockJSON.timestamp
+    block.nonce = blockJSON.nonce
+    block.transactions = ArrayBuffer[Transaction]()
+    for (txIdx <- blockJSON.transactions.indices) {
+      val txJSON = blockJSON.transactions(txIdx)
+      block.transactions.append(Transaction.fromTransactionJSON(txJSON))
+    }
     return block
   }
 }
@@ -43,7 +56,7 @@ object Block {
   * @param data
   */
 class Block(val previousHash: String, val data: String) {
-  val timestamp: Long = new Date().getTime()
+  var timestamp: Long = new Date().getTime()
   var hash: String = this.calculateHash()
   var transactions: ArrayBuffer[Transaction] = new ArrayBuffer[Transaction]()
   private var nonce: Int = 0
@@ -133,6 +146,14 @@ class Block(val previousHash: String, val data: String) {
     if (!isTransactionValid(transaction)) {
       return
     }
+
+    val sendingThread = new Thread(() => {
+      val newTxnMessage = new NewTxnMessage(transaction)
+      val udpClient = new UDPClient("test")
+      udpClient.sendMessage(newTxnMessage.serializeToJSON())
+    })
+    sendingThread.start()
+
     transactions.append(transaction)
   }
 }
