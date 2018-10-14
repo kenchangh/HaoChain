@@ -20,11 +20,16 @@ trait GenericTransaction {
 
 object Transaction {
   def toTransactionJSON(tx: Transaction): TransactionJSON = {
+    var signature = ""
+    if (!StringUtils.getStringFromKey(tx.sender).equals(GlobalAccountState.coinbaseAccount)) {
+      signature = Base64.getEncoder.encodeToString(tx.signature)
+    }
+
     val txJSON = new TransactionJSON(
       StringUtils.getStringFromKey(tx.sender),
       StringUtils.getStringFromKey(tx.recipient),
       tx.value,
-      Base64.getEncoder.encodeToString(tx.signature),
+      signature,
       tx.nonce,
       tx.transactionId
     )
@@ -35,9 +40,9 @@ object Transaction {
     val senderPublicKey = StringUtils.getPublicKeyFromString(txJSON.sender)
     val recipientPublicKey = StringUtils.getPublicKeyFromString(txJSON.recipient)
     val txn = new Transaction(
-       senderPublicKey, recipientPublicKey, txJSON.value, txJSON.nonce
+      senderPublicKey, recipientPublicKey, txJSON.value, txJSON.nonce
     )
-    txn.signature = txJSON.signature.getBytes
+    txn.signature = Base64.getDecoder.decode(txJSON.signature)
     txn.transactionId = txJSON.transactionId
     return txn
   }
@@ -71,6 +76,9 @@ class Transaction(val sender: PublicKey, val recipient: PublicKey,
   }
 
   def isValidTransaction: Boolean = {
+    if (sender.equals(GlobalAccountState.coinbaseAccount)) {
+      return true
+    }
     if (!verifySignature()) {
       println("Transaction failed to verify")
       return false

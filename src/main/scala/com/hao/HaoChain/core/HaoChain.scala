@@ -10,7 +10,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 
 class HaoChain extends Blockchain {
-  difficulty = 6
+  difficulty = 5
   HaoChain.createChainDirectory()
 }
 
@@ -57,6 +57,7 @@ object HaoChain {
 
     val minerController = new MinerController(myPublicKeyStr, globalAccountState, haoChain)
     minerController.mine()
+    minerController.listenToMessages()
 
     while (true) {
       val balance = GlobalAccountState.getBalance(myAccount)

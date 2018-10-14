@@ -20,7 +20,7 @@ class MinerController(myPublicKeyStr: String, globalAccountState: GlobalAccountS
   }
 
   def messageResponseCallback(message: String): Unit = {
-    println(message)
+//    println("Message: " + message)
   }
 
   def mine(): Unit = {

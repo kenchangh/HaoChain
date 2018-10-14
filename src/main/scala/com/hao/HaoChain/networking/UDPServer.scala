@@ -16,7 +16,6 @@ class UDPServer(val nodeId: String) {
     try {
       aSocket = Some(new DatagramSocket(port))
       val buffer: Array[Byte] = Array.ofDim[Byte](bufferSize)
-      println("Server running on port "+ port.toString)
 
       while (true) {
         val request: DatagramPacket = new DatagramPacket(buffer, buffer.length)
