@@ -1,14 +1,44 @@
 package com.hao.HaoChain.core
 
-import java.util.Date
+import java.util.{Base64, Date}
+
+import com.google.gson.{Gson, GsonBuilder}
 
 import scala.collection.mutable.ArrayBuffer
 
-class BlockJSON(val timestamp: Long, val hash: String, val transactions: Array[TransactionJSON])
+class BlockJSON(val timestamp: Long, val hash: String,
+                val nonce: Int, val transactions: Array[TransactionJSON])
+
+object Block {
+  def serializeToJson(block: Block): String = {
+    val txJSONArray: Array[TransactionJSON] = new Array[TransactionJSON](block.transactions.size)
+    for (txIdx <- 0 to block.transactions.length - 1) {
+      val tx = block.transactions(txIdx)
+      val txJSON = new TransactionJSON(
+        StringUtils.getStringFromKey(tx.sender),
+        StringUtils.getStringFromKey(tx.recipient),
+        tx.value,
+        Base64.getEncoder.encodeToString(tx.signature),
+        tx.nonce,
+        tx.transactionId
+      )
+      txJSONArray(txIdx) = txJSON
+    }
+
+    val blockJSON = new BlockJSON(block.timestamp, block.hash, block.nonce, txJSONArray)
+    return new GsonBuilder().setPrettyPrinting().create().toJson(blockJSON)
+  }
+
+  def deserializeFromJson(jsonString: String): Block = {
+    val gson = new Gson();
+    val block = gson.fromJson(jsonString, classOf[Block])
+    return block
+  }
+}
 
 /**
   * TODO: NOT ALTERING ACCOUNTS STATE, NEEDS TO BE GLOBAL STATE
-  * @param accounts
+  *
   * @param previousHash
   * @param data
   */
@@ -91,6 +121,7 @@ class Block(val previousHash: String, val data: String) {
   /**
     * This adds the transaction into the 'mempool'. Which is a list of transactions to
     * be added into the next block
+    *
     * @param transaction
     */
   def addTransaction(transaction: Transaction): Unit = {

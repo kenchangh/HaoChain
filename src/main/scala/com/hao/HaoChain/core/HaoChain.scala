@@ -36,7 +36,7 @@ object HaoChain {
 //    val account = AuthController.loginAccount("12345")
 //  }
 
-  def main(args: Array[String]): Unit = {
+  def blockchainTest(args: Array[String]): Unit = {
     var haochain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
 
