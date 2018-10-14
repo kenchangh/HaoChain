@@ -1,12 +1,14 @@
 package com.hao.HaoChain.core
 
-import java.io.{File, PrintWriter}
+import java.io.{File, IOException, PrintWriter}
 import java.security._
 import java.security.spec.{ECPublicKeySpec, KeySpec, PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.util.Base64
 import javax.crypto.spec.SecretKeySpec
 import java.security.KeyFactory
 import java.security.PublicKey
+
+import com.hao.HaoChain.controllers.OSValidator
 
 object StringUtils {
 
@@ -38,6 +40,21 @@ object StringUtils {
 
   def concatPath(path1: String, path2: String): String = {
     return new File(path1, path2).toString
+  }
+
+
+  def clearScreen(): Unit = { //Clears Screen in java
+    if (OSValidator.isMac || OSValidator.isSolaris || OSValidator.isUnix) {
+      System.out.print("\033[H\033[2J");
+      System.out.flush();
+    } else {
+      try {
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+      } catch {
+        case e: IOException =>
+        case e: InterruptedException =>
+      }
+    }
   }
 
   def getStringFromKey(key: Key): String = {

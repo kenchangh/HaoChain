@@ -1,6 +1,6 @@
 package com.hao.HaoChain.core
 
-import java.io.{File, FileReader, FileWriter, Writer}
+import java.io._
 import java.lang.IllegalStateException
 
 import com.google.gson.reflect.TypeToken
@@ -18,6 +18,7 @@ object GlobalAccountState {
 
   val accountsPath = StringUtils.concatPath(HaoChain.chainDirectoryPath, "accounts.json")
   var instance: GlobalAccountState = null
+  val coinbaseAccount = "MEkwEwYHKoZIzj0CAQYIKoZIzj0DAQEDMgAEUS41g2uxmAiVENfauThrKkTitI81q0gKK8w4VGeHxsg/FNixg/jfI5K/14Ipb1Kj"
 
   /**
     * initialize will either
@@ -28,17 +29,24 @@ object GlobalAccountState {
     */
   def initialize(): GlobalAccountState = {
     instance = new GlobalAccountState()
+
+    // must add coinbase account first to process miner rewards
+    val key = coinbaseAccount
+    val accountState = new AccountState(0, 0)
+    instance.accounts += (key -> accountState)
+
     val file = new File(accountsPath)
-    file.mkdir()
     if (file.exists()) {
       try {
         readAccountsFile()
       } catch {
         case e: IllegalStateException =>
-          StringUtils.writeToPath(accountsPath, "{}")
+        case e: FileNotFoundException =>
+          StringUtils.writeToPath(accountsPath, "{"+coinbaseAccount+":{\"nonce\": 0, \"balance\":0} }")
+          return instance
       }
     }
-    instance
+    return instance
   }
 
   def readAccountsFile(): Unit = {

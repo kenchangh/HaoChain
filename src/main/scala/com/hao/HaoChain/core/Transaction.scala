@@ -4,6 +4,8 @@ import java.security.{PrivateKey, PublicKey}
 import java.util.Base64
 
 import com.google.gson.{Gson, GsonBuilder}
+import com.hao.HaoChain.models.NewTxnMessage
+import com.hao.HaoChain.networking.UDPClient
 
 class TransactionJSON(val sender: String, val recipient: String,
                       val value: Float, val signature: String,
@@ -88,4 +90,14 @@ class Transaction(val sender: PublicKey, val recipient: PublicKey,
       StringUtils.getStringFromKey(recipient) + value.toString
     return StringUtils.verifyECDSASig(sender, data, signature)
   }
+
+  def broadcast(nodeId: String): Unit = {
+    val sendingThread = new Thread(() => {
+      val newTxnMessage = new NewTxnMessage(this)
+      val udpClient = new UDPClient(nodeId)
+      udpClient.sendMessage(newTxnMessage.serializeToJSON())
+    })
+    sendingThread.start()
+  }
+
 }

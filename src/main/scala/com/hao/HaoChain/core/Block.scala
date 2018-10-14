@@ -3,13 +3,13 @@ package com.hao.HaoChain.core
 import java.util.{Base64, Date}
 
 import com.google.gson.{Gson, GsonBuilder}
-import com.hao.HaoChain.models.NewTxnMessage
+import com.hao.HaoChain.models.{NewBlockMessage, NewTxnMessage}
 import com.hao.HaoChain.networking.UDPClient
 
 import scala.collection.mutable.ArrayBuffer
 
 class BlockJSON(val timestamp: Long, val previousHash: String, val hash: String,
-                val nonce: Int, val transactions: Array[TransactionJSON], val data: String)
+                val nonce: Int, val transactions: Array[TransactionJSON], val data: String, val miner: String)
 
 object Block {
 
@@ -23,7 +23,7 @@ object Block {
 
     val blockJSON = new BlockJSON(
       block.timestamp, block.previousHash,
-      block.hash, block.nonce, txJSONArray, block.data)
+      block.hash, block.nonce, txJSONArray, block.data, block.miner)
     return blockJSON
   }
 
@@ -59,11 +59,21 @@ class Block(val previousHash: String, val data: String) {
   var timestamp: Long = new Date().getTime()
   var hash: String = this.calculateHash()
   var transactions: ArrayBuffer[Transaction] = new ArrayBuffer[Transaction]()
+  var miner: String = ""
   private var nonce: Int = 0
 
   def calculateHash(): String = {
     return StringUtils.sha256(
       previousHash + timestamp.toString + nonce.toString + data)
+  }
+
+  def broadcast(nodeId: String): Unit = {
+    val sendingThread = new Thread(() => {
+      val udpClient = new UDPClient(nodeId)
+      val newBlockMessage = new NewBlockMessage(this)
+      udpClient.sendMessage(newBlockMessage.serializeToJSON())
+    })
+    sendingThread.start()
   }
 
   def processTransactionInBlock(transaction: Transaction): Unit = {
@@ -146,13 +156,6 @@ class Block(val previousHash: String, val data: String) {
     if (!isTransactionValid(transaction)) {
       return
     }
-
-    val sendingThread = new Thread(() => {
-      val newTxnMessage = new NewTxnMessage(transaction)
-      val udpClient = new UDPClient("test")
-      udpClient.sendMessage(newTxnMessage.serializeToJSON())
-    })
-    sendingThread.start()
 
     transactions.append(transaction)
   }

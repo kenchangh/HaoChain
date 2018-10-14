@@ -12,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 class Blockchain {
   val blocks: ArrayBuffer[Block] = ArrayBuffer()
   var difficulty: Int = 1
+  var nodeId: String = null
 
   def printBlockchain(): Unit = {
     val blockJSONArray: Array[BlockJSON] = new Array[BlockJSON](blocks.size)
@@ -25,16 +26,9 @@ class Blockchain {
 
   def addBlock(newBlock: Block) = {
     newBlock.mineBlock(difficulty)
+    newBlock.miner = nodeId
 //    acceptBlock(newBlock)
     blocks.append(newBlock)
-
-    val sendingThread = new Thread(() => {
-      val udpClient = new UDPClient("test")
-      val newBlockMessage = new NewBlockMessage(newBlock)
-      udpClient.sendMessage(newBlockMessage.serializeToJSON())
-    })
-    sendingThread.start()
-
   }
 
   def acceptBlock(newBlock: Block) = {
