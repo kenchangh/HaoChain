@@ -76,7 +76,7 @@ class Transaction(val sender: PublicKey, val recipient: PublicKey,
   }
 
   def isValidTransaction: Boolean = {
-    if (sender.equals(GlobalAccountState.coinbaseAccount)) {
+    if (StringUtils.getStringFromKey(sender).equals(GlobalAccountState.coinbaseAccount)) {
       return true
     }
     if (!verifySignature()) {

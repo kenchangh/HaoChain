@@ -2,44 +2,43 @@ package com.hao.HaoChain.networking
 
 import java.net._
 import java.io._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-object UDPServer extends App {
-  val udpServer = new UDPServer("test")
-}
-
-class UDPServer(val nodeId: String) {
+class UDPServer(val port: Int, val nodeId: String) {
   val bufferSize = 1000
-  val port = 6789
-  var aSocket: Option[DatagramSocket] = None
 
   def listen(responseCallback: Option[(String) => Unit] = None) = {
-    try {
-      aSocket = Some(new DatagramSocket(port))
-      val buffer: Array[Byte] = Array.ofDim[Byte](bufferSize)
+    var aSocket: Option[DatagramSocket] = None
 
-      while (true) {
-        val request: DatagramPacket = new DatagramPacket(buffer, buffer.length)
-        aSocket.get.receive(request)
-        val requestStr = new String(request.getData()).trim()
+    while (true) {
+//      Future {
+        try {
+          aSocket = Some(new DatagramSocket())
+          val buffer: Array[Byte] = Array.ofDim[Byte](bufferSize)
 
-        // perform a response when receive the message
-        responseCallback.map(callback => callback(requestStr))
+          val request: DatagramPacket = new DatagramPacket(buffer, buffer.length)
+          aSocket.get.receive(request)
+          val requestStr = new String(request.getData()).trim()
 
-        // send an acknowledgement
-        val requestBytes = requestStr.getBytes()
-        val replyMessage = "ack"
-        val replyBytes = replyMessage.getBytes
-        val reply: DatagramPacket = new DatagramPacket(replyBytes,
-          replyBytes.length, request.getAddress(), request.getPort())
-        aSocket.get.send(reply)
+          // perform a response when receive the message
+          responseCallback.map(callback => callback(requestStr))
+
+          // send an acknowledgement
+          val requestBytes = requestStr.getBytes()
+          val replyMessage = "ack"
+          val replyBytes = replyMessage.getBytes
+          val reply: DatagramPacket = new DatagramPacket(replyBytes,
+            replyBytes.length, request.getAddress(), request.getPort())
+          aSocket.get.send(reply)
+        } catch {
+          case e: SocketException => println("Socket: " + e.getMessage())
+          case e: IOException => println("IO: " + e.getMessage())
+        } finally {
+          aSocket foreach (_.close())
+        }
       }
-    } catch {
-      case e: SocketException => println("Socket: " + e.getMessage())
-      case e: IOException     => println("IO: " + e.getMessage())
-    } finally {
-      aSocket foreach (_.close())
-    }
+//    }
   }
 }
-
 

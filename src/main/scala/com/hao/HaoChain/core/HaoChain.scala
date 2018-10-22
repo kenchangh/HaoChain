@@ -38,8 +38,18 @@ object HaoChain {
   //    val account = AuthController.loginAccount("12345")
   //  }
 
-  def main(args: Array[String]): Unit = {
+  def printWalletBalance(myAccount: Account, printCallback: Option[() => Unit] = None) = {
+    StringUtils.clearScreen()
+    val balance = GlobalAccountState.getBalance(myAccount)
+    println("Welcome! Your account balance is: " + balance.toString + " HAO\n")
+    println("You are currently mining HAO...\n")
+    printCallback.foreach(callback => callback())
+//    println("Enter the commands (1 or 2) to get started")
+//    println("(1) Send HAO")
+//    println("(2) Receive HAO\n")
+  }
 
+  def runHaochain(port: Int): Unit = {
     var haoChain = new HaoChain()
     var globalAccountState = GlobalAccountState.initialize()
 
@@ -53,23 +63,18 @@ object HaoChain {
     val myPublicKeyStr = StringUtils.getStringFromKey(myAccount.publicKey)
     haoChain.nodeId = myPublicKeyStr
 
-    StringUtils.clearScreen()
-
-    val minerController = new MinerController(myPublicKeyStr, globalAccountState, haoChain)
+    val minerController = new MinerController(port, myAccount, globalAccountState, haoChain)
     minerController.mine()
     minerController.listenToMessages()
 
-    while (true) {
-      val balance = GlobalAccountState.getBalance(myAccount)
-      println("Welcome! Your account balance is: " + balance.toString + " HAO\n")
+//    while (true) {
+//      printWalletBalance(myAccount)
+////      val x: Int = StdIn.readInt()
+//    }
+  }
 
-      println("Enter the commands (1 or 2) to get started")
-      println("(1) Send HAO")
-      println("(2) Receive HAO\n")
-
-      val x: Int = StdIn.readInt()
-      StringUtils.clearScreen()
-    }
+  def main(args: Array[String]): Unit = {
+    runHaochain(6000)
   }
 
   //  def testMain(args: Array[String]): Unit = {

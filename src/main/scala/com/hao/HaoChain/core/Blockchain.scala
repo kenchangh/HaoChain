@@ -25,9 +25,6 @@ class Blockchain {
   }
 
   def addBlock(newBlock: Block) = {
-    newBlock.mineBlock(difficulty)
-    newBlock.miner = nodeId
-//    acceptBlock(newBlock)
     blocks.append(newBlock)
   }
 
@@ -36,8 +33,9 @@ class Blockchain {
     val isValidBlock = isValidTransactions.forall(_ == true)
     if (isValidBlock) {
       blocks.append(newBlock)
+    } else {
+      println("Invalid transaction in block")
     }
-    println("Invalid transaction in block")
   }
 
   def isChainValid(): Boolean = {

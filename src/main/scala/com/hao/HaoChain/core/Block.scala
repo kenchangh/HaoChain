@@ -67,9 +67,10 @@ class Block(val previousHash: String, val data: String) {
       previousHash + timestamp.toString + nonce.toString + data)
   }
 
-  def broadcast(nodeId: String): Unit = {
+  def broadcast(myAccount: Account, blockHeight: Int): Unit = {
     val sendingThread = new Thread(() => {
-      val udpClient = new UDPClient(nodeId)
+      val myPublicKey = StringUtils.getStringFromKey(myAccount.publicKey)
+      val udpClient = new UDPClient(myPublicKey)
       val newBlockMessage = new NewBlockMessage(this)
       udpClient.sendMessage(newBlockMessage.serializeToJSON())
     })
@@ -118,6 +119,7 @@ class Block(val previousHash: String, val data: String) {
     val recipientPublicKey = StringUtils.getStringFromKey(transaction.recipient)
     val senderPublicKey = StringUtils.getStringFromKey(transaction.sender)
     val senderAccountState = GlobalAccountState.getAccountState(senderPublicKey)
+
     if (previousHash != GenesisBlock.GENESIS_HASH) {
       if (!transaction.isValidTransaction) {
         println("Transaction failed to process.")
@@ -128,14 +130,18 @@ class Block(val previousHash: String, val data: String) {
         println("Recipient address cannot be the same as sender")
         return false
       }
-      if (transaction.value > senderAccountState.balance) {
-        println("Spending more than account balance")
-        return false
-      }
-      if (transaction.nonce <= senderAccountState.nonce) {
-        println(transaction.nonce, senderAccountState.nonce)
-        println("Nonce does not match, double spend")
-        return false
+
+      // only non-coinbase transactions go through validation
+      if (senderPublicKey != GlobalAccountState.coinbaseAccount) {
+        if (transaction.value > senderAccountState.balance) {
+          println("Spending more than account balance")
+          return false
+        }
+        if (transaction.nonce <= senderAccountState.nonce) {
+          println(transaction.nonce, senderAccountState.nonce)
+          println("Nonce does not match, double spend")
+          return false
+        }
       }
     }
     true
