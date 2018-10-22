@@ -18,7 +18,7 @@ class UDPClient(val nodeId: String) {
 
   var knownNodes = ArrayBuffer[String](
     "localhost:3000",
-//    "localhost:5000",
+    "localhost:5000",
 //    "localhost:7000"
   )
   val bufferSize = 1000

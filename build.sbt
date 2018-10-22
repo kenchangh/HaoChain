@@ -9,6 +9,9 @@ libraryDependencies += "com.google.code.gson" % "gson" % "2.7"
 // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
 libraryDependencies += "org.bouncycastle" % "bcprov-jdk15on" % "1.59"
 
+assemblyJarName in assembly := "HaoChain.jar"
+
+
 // libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
 
 // libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.5.17"

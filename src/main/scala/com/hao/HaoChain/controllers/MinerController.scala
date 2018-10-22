@@ -33,6 +33,13 @@ class MinerController(port: Int, myAccount: Account, globalAccountState: GlobalA
       val blockHeight = haoChain.blocks.length - 1
       logs.append("Mined block " + blockHeight.toString + ": Earned 100 HAO")
       printLogs()
+    } else {
+      haoChain.acceptBlock(newBlock)
+      val blockHeight = haoChain.blocks.length - 1
+      val miner = newBlock.miner
+      val minerKey = miner.substring(miner.length - 10, miner.length - 1)
+      logs.append("Block " + blockHeight.toString + " mined by: " + minerKey)
+      printLogs()
     }
   }
 
