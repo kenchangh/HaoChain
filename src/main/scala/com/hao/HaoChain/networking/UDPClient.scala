@@ -2,8 +2,12 @@ package com.hao.HaoChain.networking
 
 import java.io.IOException
 import java.net.{DatagramPacket, DatagramSocket, InetAddress, SocketException}
+
 import scala.collection.mutable.ArrayBuffer
 import com.hao.HaoChain.models.KnownNodesMessage
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object UDPClient extends App {
   val udpClient = new UDPClient("asdas")
@@ -14,7 +18,7 @@ class UDPClient(val nodeId: String) {
 
   var knownNodes = ArrayBuffer[String](
     "localhost:3000",
-    "localhost:5000",
+//    "localhost:5000",
 //    "localhost:7000"
   )
   val bufferSize = 1000
@@ -38,7 +42,7 @@ class UDPClient(val nodeId: String) {
       val buffer: Array[Byte] = Array.ofDim(bufferSize)
       val reply: DatagramPacket = new DatagramPacket(buffer, buffer.length)
       socket.get.receive(reply)
-      println("Reply: " + new String(reply.getData()).trim)
+//      println("Reply: " + new String(reply.getData()).trim)
     } catch {
       case e: SocketException => println("Socket: " + e.getMessage());
       case e: IOException => println("IO: " + e.getMessage());
@@ -50,7 +54,9 @@ class UDPClient(val nodeId: String) {
 
   def sendMessage(message: String): Unit = {
     for (node <- knownNodes) {
-      sendMessageToNode(node, message)
+      Future {
+        sendMessageToNode(node, message)
+      }
     }
   }
 

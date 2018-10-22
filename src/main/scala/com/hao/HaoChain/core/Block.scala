@@ -37,6 +37,7 @@ object Block {
     val gson = new Gson()
     val blockJSON = gson.fromJson(jsonString, classOf[BlockJSON])
     val block = new Block(blockJSON.previousHash, blockJSON.data)
+    block.miner = blockJSON.miner
     block.hash = blockJSON.hash
     block.timestamp = blockJSON.timestamp
     block.nonce = blockJSON.nonce

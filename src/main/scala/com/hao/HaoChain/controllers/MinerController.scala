@@ -25,7 +25,15 @@ class MinerController(port: Int, myAccount: Account, globalAccountState: GlobalA
   }
 
   def messageResponseCallback(message: String): Unit = {
-    //    println("Message: " + message)
+    // new block is added
+    // check if block is not mined by self
+    val newBlock: Block = Block.deserializeFromJSON(message)
+    if (newBlock.miner == StringUtils.getStringFromKey(myAccount.publicKey)) {
+      haoChain.acceptBlock(newBlock)
+      val blockHeight = haoChain.blocks.length - 1
+      logs.append("Mined block " + blockHeight.toString + ": Earned 100 HAO")
+      printLogs()
+    }
   }
 
   def printLogs(): Unit = {
@@ -76,10 +84,9 @@ class MinerController(port: Int, myAccount: Account, globalAccountState: GlobalA
                   newBlock.miner = myPublicKeyStr
                   //                  println(Block.serializeToJSON(newBlock))
                   newBlock.broadcast(myAccount, newBlockHeight)
-                  haoChain.acceptBlock(newBlock)
-                  logs.append("Mined block " + newBlockHeight.toString + ": Earned 100 HAO")
+                  //                  haoChain.acceptBlock(newBlock)
+                  //                  logs.append("Mined block " + newBlockHeight.toString + ": Earned 100 HAO")
                   mempool = Some(new Block(newBlock.hash, DEFAULT_EMPTY_DATA))
-                  printLogs()
                   lock = false
                 })
               }
